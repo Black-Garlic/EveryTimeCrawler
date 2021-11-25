@@ -6,6 +6,7 @@ public class Section {
 	private String score;
 	private String homework;
 	private String teamProject;
+	private String grade;
 	private String exam;
 	private ArrayList<Review> reviewList = new ArrayList<>();;
 	
@@ -13,11 +14,12 @@ public class Section {
 		this.sectionCode = sectionCode;
 	}
 	
-	public void setInfo(String professor, String score, String homework, String teamProject, String exam) {
+	public void setInfo(String professor, String score, String homework, String teamProject, String grade, String exam) {
 		this.professor = professor;
 		this.score = score;
 		this.homework = homework;
 		this.teamProject = teamProject;
+		this.grade = grade;
 		this.exam = exam;
 	}
 
