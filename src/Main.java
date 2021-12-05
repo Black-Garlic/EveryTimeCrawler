@@ -29,7 +29,7 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
 		// 크롬 설정을 담은 객체 생성
 		ChromeOptions options = new ChromeOptions();
 		// 브라우저가 눈에 보이지 않고 내부적으로 돈다.
@@ -49,9 +49,9 @@ public class Main {
 		}
 
 		WebElement loginId = driver.findElement(By.name("userid"));
-		loginId.sendKeys("samuel1226");
+		loginId.sendKeys("Your Id");
 		WebElement loginPassword = driver.findElement(By.name("password"));
-		loginPassword.sendKeys("hn1020011");
+		loginPassword.sendKeys("Your Password");
 		WebElement loginButton = driver.findElement(By.xpath("//*[@id=\"container\"]/form/p[3]/input"));
 		loginButton.click();
 
@@ -65,55 +65,59 @@ public class Main {
 		String topCategory = topCategoryList[10];
 
 		for (int lectureCount = 0; lectureCount < lectureList.size(); lectureCount++) {
-			if (lectureList.get(lectureCount).getTopCategory().equals(topCategory)) {
-				for (int sectionCount = 0; sectionCount < lectureList.get(lectureCount).getSectionList().size(); sectionCount++) {
-					String url = "https://everytime.kr/lecture/view/"
-							+ lectureList.get(lectureCount).getSectionList().get(sectionCount).getSectionCode();
-					driver.get(url);
+			//if (lectureList.get(lectureCount).getTopCategory().equals(topCategory)) {}
+			for (int sectionCount = 0; sectionCount < lectureList.get(lectureCount).getSectionList().size(); sectionCount++) {
+				String url = "https://everytime.kr/lecture/view/"
+						+ lectureList.get(lectureCount).getSectionList().get(sectionCount).getSectionCode();
+				driver.get(url);
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
 
-					System.out.println(lectureList.get(lectureCount).getLectureName());
-					
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-					}
+				WebElement lectureProfessor = driver.findElement(By.xpath("//*[@id=\"container\"]/div[2]/p[1]/span"));
 
-					WebElement lectureProfessor = driver.findElement(By.xpath("//*[@id=\"container\"]/div[2]/p[1]/span"));
+				WebElement lectureScore = driver
+						.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[1]/span/span[1]"));
 
-					WebElement lectureScore = driver
-							.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[1]/span/span[1]"));
+				WebElement lectureHomework = driver
+						.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[1]/span"));
 
-					WebElement lectureHomework = driver
-							.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[1]/span"));
+				WebElement lectureTeam = driver
+						.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[2]/span"));
+				
+				WebElement lectureGrade = driver
+						.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[3]/span"));
 
-					WebElement lectureTeam = driver
-							.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[2]/span"));
-					
-					WebElement lectureGrade = driver
-							.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[3]/span"));
+				WebElement lectureExam = driver
+						.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[5]/span"));
+				
+				System.out.println(lectureList.get(lectureCount).getLectureName() + " - " + lectureProfessor.getText());
+				
+				System.out.println("Score: " + lectureScore.getText());
+				System.out.println("Homework: " + lectureHomework.getText());
+				System.out.println("TeamProject: " + lectureTeam.getText());
+				System.out.println("Grade: " + lectureGrade.getText());
+				System.out.println("Exam: " + lectureExam.getText());
 
-					WebElement lectureExam = driver
-							.findElement(By.xpath("//*[@id=\"container\"]/div[4]/div[1]/div[2]/p[5]/span"));
+				lectureList.get(lectureCount).getSectionList().get(sectionCount).setInfo(
+						lectureProfessor.getText(),
+						lectureScore.getText(),
+						lectureHomework.getText(),
+						lectureTeam.getText(),
+						lectureGrade.getText(),
+						lectureExam.getText());
 
-					lectureList.get(lectureCount).getSectionList().get(sectionCount).setInfo(
-							lectureProfessor.getText(),
-							lectureScore.getText(),
-							lectureHomework.getText(),
-							lectureTeam.getText(),
-							lectureGrade.getText(),
-							lectureExam.getText());
+				List<WebElement> article = driver.findElement(By.className("articles"))
+						.findElements(By.tagName("article"));
+				System.out.println(article.size());
 
-					List<WebElement> article = driver.findElement(By.className("articles"))
-							.findElements(By.tagName("article"));
-					System.out.println(article.size());
-
-					for (int reviewCount = 0; reviewCount < article.size(); reviewCount++) {
-						System.out.println(reviewCount);
-						int star = article.get(reviewCount).findElement(By.className("rate"))
-								.findElement(By.className("star")).findElement(By.className("on")).getSize().width / 12;
-						String review = article.get(reviewCount).findElement(By.className("text")).getText();
-						lectureList.get(lectureCount).getSectionList().get(sectionCount).addReview(star, review);
-					}
+				for (int reviewCount = 0; reviewCount < article.size(); reviewCount++) {
+					int star = article.get(reviewCount).findElement(By.className("rate"))
+							.findElement(By.className("star")).findElement(By.className("on")).getSize().width / 12;
+					String review = article.get(reviewCount).findElement(By.className("text")).getText();
+					lectureList.get(lectureCount).getSectionList().get(sectionCount).addReview(star, review);
 				}
 			}
 		}
@@ -126,9 +130,8 @@ public class Main {
 		ArrayList<Lecture> tmpLectureList = new ArrayList<Lecture>();
 		
 		for (int lectureCount = 0; lectureCount < lectureList.size(); lectureCount++) {
-			if (lectureList.get(lectureCount).getTopCategory().equals(topCategory)) {
-				tmpLectureList.add(lectureList.get(lectureCount));
-			}
+			//if (lectureList.get(lectureCount).getTopCategory().equals(topCategory)) {}
+			tmpLectureList.add(lectureList.get(lectureCount));
 		}
 		
 		
@@ -137,7 +140,7 @@ public class Main {
 		
 		String lectureJson = gson.toJson(tmpLectureList);
 
-		System.out.println(lectureJson);
+		//System.out.println(lectureJson);
 		
 //		for (int lectureCount = 0; lectureCount < 30; lectureCount++) {
 //			String lectureName = lectureList.get(lectureCount).getLectureName();
@@ -168,7 +171,7 @@ public class Main {
 				driver.quit();
 			}
 			
-			String filePath = topCategory + ".txt";
+			String filePath = "Review.txt";
 			
 			FileWriter fileWriter = new FileWriter(filePath);
 			fileWriter.write(lectureJson);
@@ -176,7 +179,6 @@ public class Main {
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
-
 	}
 
 	public static void setLectureList() {
@@ -322,6 +324,13 @@ public class Main {
 		lectureList.add(new Lecture(topCategoryList[9], "전공기초", "UIL30051", "Survey of American Law"));
 		lectureList.add(new Lecture(topCategoryList[10], "특론", "GEK40091", "교양특론 2"));
 
+		/*
+		for (int i = 0; i < lectureList.size(); i++) {
+			Lecture lecture = lectureList.get(i);
+			System.out.println("<li>" + lecture.getLectureName() + "  <input type='checkbox' name='" + lecture.getTopCategory() + "-" + lecture.getSubCategory() + "' value='0' style='float:right' onclick='changeCredit(0, \"" + lecture.getTopCategory() + "-" + lecture.getSubCategory() + "\")'></li>");
+		}
+		*/
+		
 		setSectionList();
 	}
 
